@@ -7,6 +7,11 @@ import api.schemas.interview as interview_schema
 router = APIRouter()
 
 
+@router.post('/interview')
+async def create_interview():
+    pass
+
+
 @router.get('/interview/random', response_model=List[interview_schema.Interview])
 async def obtain_random_interviews():
     return [interview_schema.Interview(id=1, content='これまで開発したもので一番自信があるものはなんですか')]
