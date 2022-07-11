@@ -19,5 +19,5 @@ async def add_bookmark_interview():
 
 
 @router.delete('/interview/bookmark')
-async def delete_boookmark_interview():
+async def delete_bookmark_interview():
     pass
