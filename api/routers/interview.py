@@ -1,16 +1,20 @@
+from typing import List
+
 from fastapi import APIRouter
+
+import api.schemas.interview as interview_schema
 
 router = APIRouter()
 
 
-@router.get('/interview/random')
+@router.get('/interview/random', response_model=List[interview_schema.Interview])
 async def obtain_random_interviews():
-    pass
+    return [interview_schema.Interview(id=1, content='これまで開発したもので一番自信があるものはなんですか')]
 
 
-@router.get('/interview/bookmark')
+@router.get('/interview/bookmark', response_model=List[interview_schema.Interview])
 async def obtain_bookmarked_interviews():
-    pass
+    return [interview_schema.Interview(id=1, content='これまで開発したもので一番自信があるものはなんですか')]
 
 
 @router.post('/interview/bookmark')
