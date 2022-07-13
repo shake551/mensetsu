@@ -28,12 +28,29 @@ class UserBase(BaseModel):
 
 
 class UserInDB(UserBase):
-    hashed_password: str
+    id: int
+    created_at: datetime.datetime
+    updated_at: datetime.datetime
+
+
+class UserSignupRequest(BaseModel):
+    username: Optional[str] = Field(None, example='test_user')
+    plain_password: Optional[str] = Field(None, example='test_password')
 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
+
+def signup(signup_request: UserSignupRequest):
+    return UserInDB(
+        id=1,
+        username=signup_request.username,
+        hashed_password=get_password_hash(signup_request.plain_password),
+        created_at=datetime.datetime.now(),
+        updated_at=datetime.datetime.now(),
+    )
 
 
 def verify_password(plain_password, hashed_password):
@@ -72,9 +89,12 @@ def create_access_token(data: dict, expires_delta: Union[datetime.timedelta, Non
 
 fake_users_db = {
     "test_user": {
+        "id": 1,
         "username": "test_user",
         "hashed_password": "$2b$12$6KxDQ9zvm8.QFfm7OecP4eW7QJIIHxJXQWekJ1bmE0NXvfXONxJr6",
         "disabled": False,
+        "created_at": datetime.datetime.now(),
+        "updated_at": datetime.datetime.now(),
     }
 }
 
