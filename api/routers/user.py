@@ -10,6 +10,13 @@ import api.schemas.user as user_schema
 router = APIRouter()
 
 
+@router.post('/signup', response_model=user_schema.UserInDB)
+async def signup(form_data: OAuth2PasswordRequestForm = Depends()):
+    signup_request = user_schema.UserSignupRequest(username=form_data.username, plain_password=form_data.password)
+
+    return user_schema.signup(signup_request=signup_request)
+
+
 @router.post("/token", response_model=user_schema.Token)
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
     user = user_schema.authenticate_user(user_schema.fake_users_db, form_data.username, form_data.password)
