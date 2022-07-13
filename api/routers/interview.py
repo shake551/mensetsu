@@ -20,12 +20,28 @@ async def create_interview(interview_body: interview_schema.InterviewCreate):
 
 @router.get('/interview/random', response_model=List[interview_schema.Interview])
 async def obtain_random_interviews():
-    return [interview_schema.Interview(id=1, content='これまで開発したもので一番自信があるものはなんですか')]
+    now = datetime.datetime.now()
+
+    return [
+        interview_schema.Interview(id=1, content='これまで開発したもので一番自信があるものはなんですか', created_at=now, updated_at=now),
+        interview_schema.Interview(id=2, content='使用技術を選択した理由はなんですか', created_at=now, updated_at=now),
+        interview_schema.Interview(id=3, content='こだわったポイントはどこですか', created_at=now, updated_at=now),
+        interview_schema.Interview(id=4, content='一番難しかったことはなんですか', created_at=now, updated_at=now),
+        interview_schema.Interview(id=5, content='今後改善したいところはありますか', created_at=now, updated_at=now)
+    ]
 
 
 @router.get('/interview/bookmark', response_model=List[interview_schema.Interview])
 async def obtain_bookmarked_interviews():
-    return [interview_schema.Interview(id=1, content='これまで開発したもので一番自信があるものはなんですか')]
+    now = datetime.datetime.now()
+
+    return [
+        interview_schema.Interview(id=1, content='これまで開発したもので一番自信があるものはなんですか', created_at=now, updated_at=now),
+        interview_schema.Interview(id=2, content='使用技術を選択した理由はなんですか', created_at=now, updated_at=now),
+        interview_schema.Interview(id=3, content='こだわったポイントはどこですか', created_at=now, updated_at=now),
+        interview_schema.Interview(id=4, content='一番難しかったことはなんですか', created_at=now, updated_at=now),
+        interview_schema.Interview(id=5, content='今後改善したいところはありますか', created_at=now, updated_at=now)
+    ]
 
 
 @router.post('/interview/bookmark', response_model=interview_schema.BookmarkInterviewCreateResponse)
