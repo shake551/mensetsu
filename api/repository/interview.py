@@ -1,5 +1,8 @@
+from typing import List
+
 from fastapi import HTTPException
 from jose import jwt, JWTError
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 from starlette import status
 
@@ -39,3 +42,13 @@ def create_interview(
     db.refresh(interview)
 
     return interview
+
+
+def obtain_random_interviews(
+        db: Session,
+        token: str,
+) -> List[interview_schema.Interview]:
+    return db.query(interview_model.Interview)\
+        .order_by(func.rand())\
+        .limit(5)\
+        .all()
