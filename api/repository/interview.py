@@ -2,7 +2,7 @@ from typing import List
 
 from fastapi import HTTPException
 from jose import jwt, JWTError
-from sqlalchemy import func
+from sqlalchemy import func, and_
 from sqlalchemy.orm import Session
 from starlette import status
 
@@ -76,7 +76,7 @@ def bookmark_interviews(
     if user is None:
         raise credentials_exception
 
-    interview = db.query(interview_model.Interview)\
+    interview = db.query(interview_model.Interview) \
         .filter(interview_model.Interview.id == bookmark_request.interview_id).first()
 
     if not interview:
@@ -93,3 +93,32 @@ def bookmark_interviews(
     db.refresh(bookmark)
 
     return bookmark
+
+
+def obtain_bookmarked_interviews(
+        db: Session,
+        token: str,
+) -> List[interview_schema.Interview]:
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        if username is None:
+            raise credentials_exception
+        token_data = user_schema.TokenData(username=username)
+    except JWTError:
+        raise credentials_exception
+    user = user_repository.get_user(db, username=token_data.username)
+    if user is None:
+        raise credentials_exception
+
+    return db.query(interview_model.Interview) \
+        .join(interview_model.Bookmark,
+              and_(interview_model.Bookmark.user_id == user.id,
+                   interview_model.Bookmark.interview_id == interview_model.Interview.id)) \
+        .order_by(interview_model.Bookmark.created_at) \
+        .all()
