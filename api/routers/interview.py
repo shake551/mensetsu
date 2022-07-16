@@ -1,21 +1,27 @@
 import datetime
 from typing import List
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+from fastapi.security import OAuth2PasswordBearer
+from sqlalchemy.orm import Session
+
+import api.repository.interview as interview_repository
+from api.db import get_db
 
 import api.schemas.interview as interview_schema
 
 router = APIRouter()
 
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
-@router.post('/interview', response_model=interview_schema.InterviewCreateResponse)
-async def create_interview(interview_body: interview_schema.InterviewCreate):
-    return interview_schema.InterviewCreateResponse(
-        id=1,
-        created_at=datetime.datetime.now(),
-        updated_at=datetime.datetime.now(),
-        **interview_body.dict()
-    )
+
+@router.post('/interview', response_model=interview_schema.Interview)
+def create_interview(
+        interview_body: interview_schema.InterviewCreate,
+        db: Session = Depends(get_db),
+        token: str = Depends(oauth2_scheme),
+):
+    return interview_repository.create_interview(db=db, interview_create=interview_body, token=token)
 
 
 @router.get('/interview/random', response_model=List[interview_schema.Interview])
