@@ -1,4 +1,3 @@
-import datetime
 from typing import List
 
 from fastapi import APIRouter, Depends
@@ -54,5 +53,9 @@ async def add_bookmark_interview(
 
 
 @router.delete('/interview/bookmark')
-async def delete_bookmark_interview(bookmark_body: interview_schema.BookmarkInterviewDelete):
-    pass
+async def delete_bookmark_interview(
+        bookmark_body: interview_schema.BookmarkInterviewDelete,
+        db: Session = Depends(get_db),
+        token: str = Depends(oauth2_scheme),
+):
+    interview_repository.delete_bookmark_interview(bookmark_request=bookmark_body, db=db, token=token)
