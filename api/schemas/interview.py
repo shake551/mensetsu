@@ -38,6 +38,10 @@ class BookmarkInterviewCreate(BookmarkInterview):
     pass
 
 
+class BookmarkInterviewDelete(BookmarkInterview):
+    pass
+
+
 class BookmarkInterviewCreateResponse(BookmarkInterviewCreate):
     user_id: int
 
