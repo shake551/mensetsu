@@ -48,7 +48,48 @@ def obtain_random_interviews(
         db: Session,
         token: str,
 ) -> List[interview_schema.Interview]:
-    return db.query(interview_model.Interview)\
-        .order_by(func.rand())\
-        .limit(5)\
+    return db.query(interview_model.Interview) \
+        .order_by(func.rand()) \
+        .limit(5) \
         .all()
+
+
+def bookmark_interviews(
+        bookmark_request: interview_schema.BookmarkInterviewCreate,
+        db: Session,
+        token: str,
+) -> List[interview_schema.Interview]:
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        if username is None:
+            raise credentials_exception
+        token_data = user_schema.TokenData(username=username)
+    except JWTError:
+        raise credentials_exception
+    user = user_repository.get_user(db, username=token_data.username)
+    if user is None:
+        raise credentials_exception
+
+    interview = db.query(interview_model.Interview)\
+        .filter(interview_model.Interview.id == bookmark_request.interview_id).first()
+
+    if not interview:
+        not_found_exception = HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Could not find the interview",
+        )
+        raise not_found_exception
+
+    bookmark = interview_model.Bookmark(**bookmark_request.dict(), user_id=user.id)
+
+    db.add(bookmark)
+    db.commit()
+    db.refresh(bookmark)
+
+    return bookmark

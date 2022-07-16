@@ -46,10 +46,15 @@ async def obtain_bookmarked_interviews():
 
 
 @router.post('/interview/bookmark', response_model=interview_schema.BookmarkInterviewCreateResponse)
-async def add_bookmark_interview(bookmark_body: interview_schema.BookmarkInterviewCreate):
-    return interview_schema.BookmarkInterviewCreateResponse(
-        user_id=1,
-        **bookmark_body.dict()
+async def add_bookmark_interview(
+        bookmark_body: interview_schema.BookmarkInterviewCreate,
+        db: Session = Depends(get_db),
+        token: str = Depends(oauth2_scheme),
+):
+    return interview_repository.bookmark_interviews(
+        bookmark_request=bookmark_body,
+        db=db,
+        token=token,
     )
 
 
