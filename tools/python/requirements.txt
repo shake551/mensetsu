@@ -6,3 +6,4 @@ python-jose
 passlib
 sqlalchemy
 aiomysql
+mysqlclient
